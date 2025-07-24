@@ -6,7 +6,9 @@ import { Employee, EmployeeDocument } from './schemas/employee.schema';
 
 @Injectable()
 export class EmployeesService {
-  constructor(@InjectModel(Employee.name) private employeeModel: Model<EmployeeDocument>) {}
+  constructor(
+    @InjectModel(Employee.name) private employeeModel: Model<EmployeeDocument>,
+  ) {}
 
   async findAll(): Promise<Employee[]> {
     return this.employeeModel.find().exec();
@@ -17,8 +19,20 @@ export class EmployeesService {
     return createdEmployee.save();
   }
 
+  async update(
+    id: string,
+    name: string,
+    position: string,
+  ): Promise<Employee | null> {
+    return this.employeeModel.findByIdAndUpdate(
+      id,
+      { name, position },
+      { new: true },
+    );
+  }
+
   async deleteById(id: string): Promise<{ deleted: boolean }> {
-  const result = await this.employeeModel.deleteOne({ _id: id }).exec();
-  return { deleted: result.deletedCount === 1 };
-}
+    const result = await this.employeeModel.deleteOne({ _id: id }).exec();
+    return { deleted: result.deletedCount === 1 };
+  }
 }

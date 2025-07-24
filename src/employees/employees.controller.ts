@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
 
 import { EmployeesService } from './employees.service';
@@ -10,6 +10,7 @@ class CreateEmployeeDto {
   @ApiProperty()
   position: string;
 }
+
 
 @ApiTags('employees')
 @Controller('employees')
@@ -26,6 +27,13 @@ export class EmployeesController {
   @Post()
   async createEmployee(@Body() body: CreateEmployeeDto) {
     return this.employeesService.create(body.name, body.position);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch(':id')
+  async updateEmployee(@Param('id') id: string , @Body() body: CreateEmployeeDto) {
+    return this.employeesService.update(id, body.name,body.position);
   }
 
   @UseGuards(JwtAuthGuard)
