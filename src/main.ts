@@ -1,0 +1,30 @@
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe());
+
+  const config = new DocumentBuilder()
+    .setTitle('Simple Auth API')
+    .setDescription('API สำหรับ login/register และ employees')
+    .setVersion('1.0')
+    .addBearerAuth() // ให้สามารถกรอก JWT token ใน Swagger
+    .build();
+
+  app.enableCors({
+    origin: 'http://localhost:3001', // หรือ '*' สำหรับอนุญาตทุก origin (ใช้เฉพาะตอน dev)
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
+  await app.listen(process.env.PORT ?? 3000);
+  console.log('Server running on http://localhost:3000');
+  console.log('Swagger docs: http://localhost:3000/api');
+}
+bootstrap();
